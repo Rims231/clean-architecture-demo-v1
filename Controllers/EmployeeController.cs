@@ -12,14 +12,19 @@ namespace clean_architecture_demo_v1.Controllers
     {
         private readonly IMediator _mediator;
         private readonly IEmployeeRepository _employeeRepository;
+        private readonly IExternalApiService _externalApiService;
 
-        public EmployeeController(IMediator mediator, IEmployeeRepository employeeRepository)
+        public EmployeeController(
+            IMediator mediator,
+            IEmployeeRepository employeeRepository,
+            IExternalApiService externalApiService)  
         {
             _mediator = mediator;
             _employeeRepository = employeeRepository;
+            _externalApiService = externalApiService;
         }
 
-        // GET: api/employee
+    
         [HttpGet]
         public async Task<IActionResult> GetAllEmployees()
         {
@@ -27,7 +32,7 @@ namespace clean_architecture_demo_v1.Controllers
             return Ok(employees);
         }
 
-        // GET: api/employee/{id}
+     
         [HttpGet("{id:guid}")]
         public async Task<IActionResult> GetEmployeeById(Guid id)
         {
@@ -38,7 +43,7 @@ namespace clean_architecture_demo_v1.Controllers
             return Ok(employee);
         }
 
-        // POST: api/employee — uses MediatR
+     
         [HttpPost]
         public async Task<IActionResult> AddEmployee([FromBody] EmployeeEntity employee)
         {
@@ -49,7 +54,7 @@ namespace clean_architecture_demo_v1.Controllers
             return CreatedAtAction(nameof(GetEmployeeById), new { id = created.Id }, created);
         }
 
-        // PUT: api/employee/{id}
+    
         [HttpPut("{id:guid}")]
         public async Task<IActionResult> UpdateEmployee(Guid id, [FromBody] EmployeeEntity employee)
         {
@@ -67,7 +72,7 @@ namespace clean_architecture_demo_v1.Controllers
             return Ok(employee);
         }
 
-        // DELETE: api/employee/{id}
+      
         [HttpDelete("{id:guid}")]
         public async Task<IActionResult> DeleteEmployee(Guid id)
         {
@@ -77,6 +82,16 @@ namespace clean_architecture_demo_v1.Controllers
 
             await _employeeRepository.DeleteEmployeeAsync(id);
             return NoContent();
+        }
+
+
+       
+        [HttpGet("external/posts")]
+        public async Task<IActionResult> GetExternalPosts()
+        {
+            
+            var posts = await _externalApiService.GetAsync<object>("/posts");
+            return Ok(posts);
         }
     }
 }
